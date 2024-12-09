@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { getNextThreeEvents } from "./utils";
 import { useTranslation } from "react-i18next";
 import TimezoneSelector from "./TimezoneSelector";
