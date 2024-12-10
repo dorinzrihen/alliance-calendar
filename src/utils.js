@@ -54,14 +54,15 @@ export const getNextThreeEvents = (startDate) => {
     eventStart.setUTCDate(currentTime.getUTCDate() + (event.day - currentDay));
     eventStart.setUTCHours(hours, minutes, 0, 0);
 
-    // If the calculated event start time is in the past, move it to the next week
-    if (eventStart < currentTime) {
-      eventStart.setUTCDate(eventStart.getUTCDate() + 7);
-    }
-
     // Calculate event end time
     const eventEnd = new Date(eventStart);
     eventEnd.setMinutes(eventEnd.getMinutes() + event.duration);
+
+    // If the calculated event start time is in the past but the event is not ongoing, move it to the next week
+    if (eventStart < currentTime && currentTime > eventEnd) {
+      eventStart.setUTCDate(eventStart.getUTCDate() + 7);
+      eventEnd.setUTCDate(eventEnd.getUTCDate() + 7);
+    }
 
     // Calculate remaining time in milliseconds
     const timeLeftMs = eventStart - currentTime;
@@ -77,9 +78,9 @@ export const getNextThreeEvents = (startDate) => {
 
   // Filter upcoming events and sort by proximity
   const upcomingEvents = formattedEvents
-    .filter((event) => event.ongoing || event.eventStart >= currentTime) // Include ongoing and future events
+    .filter((event) => event.ongoing || currentTime < event.eventStart) // Show only ongoing and future events
     .sort((a, b) => a.eventStart - b.eventStart)
-    .slice(0, 3);
+    .slice(0, 3); // Limit to next 3 events
 
   return upcomingEvents;
 };
